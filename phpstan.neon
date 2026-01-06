@@ -1,0 +1,21 @@
+parameters:
+    paths:
+        - src
+        - config
+
+    level: 5
+
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\Database\\.*::.*#'
+        - '#Parameter \#1 \$callback of method Illuminate\\Support\\Collection<.*>::first\(\) expects#'
+        -
+            identifier: missingType.iterableValue
+        -
+            identifier: missingType.generics
+
+    excludePaths:
+        - tests
+
+    reportUnmatchedIgnoredErrors: false
+
+    tmpDir: build/phpstan

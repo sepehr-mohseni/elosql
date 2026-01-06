@@ -1,0 +1,35 @@
+/vendor/
+/node_modules/
+/.idea/
+/.vscode/
+/.phpunit.cache/
+/build/
+/coverage/
+
+composer.lock
+
+.env
+.env.*
+!.env.example
+
+*.log
+*.cache
+*.swp
+*.swo
+*~
+
+.DS_Store
+Thumbs.db
+
+.php-cs-fixer.cache
+.phpunit.result.cache
+phpstan.cache
+
+# Testing
+.phpunit.result.cache
+testbench.yaml
+
+# Editor
+*.sublime-project
+*.sublime-workspace
+nbproject/
