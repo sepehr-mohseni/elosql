@@ -4,18 +4,22 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests\Feature;
 
+use Illuminate\Filesystem\Filesystem;
 use Sepehr_Mohseni\Elosql\Generators\MigrationGenerator;
 use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Parsers\SQLiteSchemaParser;
 use Sepehr_Mohseni\Elosql\Tests\TestCase;
-use Illuminate\Filesystem\Filesystem;
 
 class GenerateFromDatabaseTest extends TestCase
 {
     private SQLiteSchemaParser $parser;
+
     private MigrationGenerator $migrationGenerator;
+
     private ModelGenerator $modelGenerator;
+
     private string $tempDir;
+
     private Filesystem $filesystem;
 
     protected function setUp(): void
@@ -24,9 +28,9 @@ class GenerateFromDatabaseTest extends TestCase
 
         $this->filesystem = new Filesystem();
         $this->tempDir = sys_get_temp_dir() . '/elosql_feature_test_' . uniqid();
-        $this->filesystem->makeDirectory($this->tempDir, 0755, true);
-        $this->filesystem->makeDirectory($this->tempDir . '/migrations', 0755, true);
-        $this->filesystem->makeDirectory($this->tempDir . '/Models', 0755, true);
+        $this->filesystem->makeDirectory($this->tempDir, 0o755, true);
+        $this->filesystem->makeDirectory($this->tempDir . '/migrations', 0o755, true);
+        $this->filesystem->makeDirectory($this->tempDir . '/Models', 0o755, true);
 
         $this->parser = $this->app->make(SQLiteSchemaParser::class);
         $this->parser->setConnection($this->app['db']->connection('testing'));

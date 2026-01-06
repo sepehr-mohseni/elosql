@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Commands;
 
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Sepehr_Mohseni\Elosql\Analyzers\SchemaComparator;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class ShowSchemaDiffCommand extends Command
 {
@@ -43,7 +44,7 @@ class ShowSchemaDiffCommand extends Command
         $connection = $this->option('connection') ?? config('elosql.connection') ?? config('database.default');
         $asJson = (bool) $this->option('json');
 
-        if (!$asJson) {
+        if (! $asJson) {
             $this->info("Analyzing schema drift on connection: {$connection}");
         }
 
@@ -75,7 +76,7 @@ class ShowSchemaDiffCommand extends Command
                 || $report['summary']['removed_tables'] > 0;
 
             return $hasChanges ? self::FAILURE : self::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($asJson) {
                 $this->line(json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
             } else {
@@ -131,7 +132,7 @@ class ShowSchemaDiffCommand extends Command
         );
 
         // New tables
-        if (!empty($report['new_tables'])) {
+        if (! empty($report['new_tables'])) {
             $this->newLine();
             $this->comment('New Tables (not in any migration):');
             foreach ($report['new_tables'] as $table) {
@@ -140,22 +141,22 @@ class ShowSchemaDiffCommand extends Command
         }
 
         // Modified tables
-        if (!empty($report['modified_tables'])) {
+        if (! empty($report['modified_tables'])) {
             $this->newLine();
             $this->comment('Modified Tables (columns differ from migration):');
             foreach ($report['modified_tables'] as $tableName => $diff) {
                 $this->line("  ~ {$tableName}");
-                if (!empty($diff['columns']['new'])) {
-                    $this->line("      New columns: " . implode(', ', $diff['columns']['new']));
+                if (! empty($diff['columns']['new'])) {
+                    $this->line('      New columns: ' . implode(', ', $diff['columns']['new']));
                 }
-                if (!empty($diff['columns']['removed'])) {
-                    $this->line("      Removed columns: " . implode(', ', $diff['columns']['removed']));
+                if (! empty($diff['columns']['removed'])) {
+                    $this->line('      Removed columns: ' . implode(', ', $diff['columns']['removed']));
                 }
             }
         }
 
         // Removed tables
-        if (!empty($report['removed_tables'])) {
+        if (! empty($report['removed_tables'])) {
             $this->newLine();
             $this->comment('Removed Tables (migration exists but table not in database):');
             foreach ($report['removed_tables'] as $table) {
@@ -164,12 +165,12 @@ class ShowSchemaDiffCommand extends Command
         }
 
         // Recommended actions
-        if (!empty($report['actions'])) {
+        if (! empty($report['actions'])) {
             $this->newLine();
             $this->info('Recommended Actions:');
             foreach ($report['actions'] as $action) {
                 $this->line("  • {$action['description']}");
-                $this->line("    Tables: " . implode(', ', $action['tables']));
+                $this->line('    Tables: ' . implode(', ', $action['tables']));
             }
         }
 

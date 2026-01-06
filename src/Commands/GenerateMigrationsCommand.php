@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Commands;
 
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Sepehr_Mohseni\Elosql\Analyzers\SchemaComparator;
 use Sepehr_Mohseni\Elosql\Generators\MigrationGenerator;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class GenerateMigrationsCommand extends Command
 {
@@ -110,7 +111,7 @@ class GenerateMigrationsCommand extends Command
             $this->displayGeneratedFiles($writtenFiles);
 
             return self::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Error: ' . $e->getMessage());
 
             if ($this->output->isVerbose()) {
@@ -125,6 +126,7 @@ class GenerateMigrationsCommand extends Command
      * Parse all tables.
      *
      * @param array<string> $tableNames
+     *
      * @return array<TableSchema>
      */
     protected function parseTables($parser, array $tableNames): array
@@ -152,6 +154,7 @@ class GenerateMigrationsCommand extends Command
      * Filter tables that need migrations (diff mode).
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<TableSchema>
      */
     protected function filterForDiff(array $tables): array
@@ -163,11 +166,11 @@ class GenerateMigrationsCommand extends Command
         $newTables = $comparison['new'];
         $modifiedTables = $comparison['modified'];
 
-        if (!empty($newTables)) {
+        if (! empty($newTables)) {
             $this->info('New tables found: ' . implode(', ', $newTables));
         }
 
-        if (!empty($modifiedTables)) {
+        if (! empty($modifiedTables)) {
             $this->warn('Modified tables found: ' . implode(', ', $modifiedTables));
             $this->line('Note: Modified tables will be regenerated. Review carefully before running migrations.');
         }
@@ -207,7 +210,7 @@ class GenerateMigrationsCommand extends Command
         }
 
         $this->newLine();
-        $this->info("Preview complete. {" . count($migrations) . "} migrations would be generated.");
+        $this->info('Preview complete. {' . count($migrations) . '} migrations would be generated.');
         $this->info('Run without --preview to write files.');
     }
 
@@ -215,13 +218,14 @@ class GenerateMigrationsCommand extends Command
      * Write migrations to disk.
      *
      * @param array<string, string> $migrations
+     *
      * @return array<string>
      */
     protected function writeMigrations(array $migrations, bool $force): array
     {
         $migrationsPath = config('elosql.migrations_path', database_path('migrations'));
 
-        if (!$force) {
+        if (! $force) {
             $existingFiles = [];
 
             foreach (array_keys($migrations) as $filename) {
@@ -231,13 +235,13 @@ class GenerateMigrationsCommand extends Command
                 }
             }
 
-            if (!empty($existingFiles)) {
+            if (! empty($existingFiles)) {
                 $this->warn('The following files already exist:');
                 foreach ($existingFiles as $file) {
                     $this->line("  - {$file}");
                 }
 
-                if (!$this->confirm('Overwrite existing files?', false)) {
+                if (! $this->confirm('Overwrite existing files?', false)) {
                     // Remove existing files from migrations
                     foreach ($existingFiles as $file) {
                         unset($migrations[$file]);

@@ -15,16 +15,18 @@ class DependencyResolver
      * Alias for sortByDependencies for more intuitive API.
      *
      * @param array<TableSchema> $tables
-     * @return array<TableSchema>
      *
      * @throws SchemaParserException
+     *
+     * @return array<TableSchema>
      */
     public function resolve(array $tables): array
     {
         // First check for circular dependencies
         $cycles = $this->detectCircularDependencies($tables);
-        if (!empty($cycles)) {
+        if (! empty($cycles)) {
             $cycleStr = implode(' -> ', $cycles[0]);
+
             throw SchemaParserException::circularDependency($cycleStr);
         }
 
@@ -36,9 +38,10 @@ class DependencyResolver
      * Tables with no dependencies come first, tables that depend on others come later.
      *
      * @param array<TableSchema> $tables
-     * @return array<TableSchema>
      *
      * @throws GeneratorException
+     *
+     * @return array<TableSchema>
      */
     public function sortByDependencies(array $tables): array
     {
@@ -52,7 +55,7 @@ class DependencyResolver
         $visiting = [];
 
         foreach ($tables as $table) {
-            if (!isset($visited[$table->name])) {
+            if (! isset($visited[$table->name])) {
                 $this->topologicalSort($table->name, $tableMap, $sorted, $visited, $visiting);
             }
         }
@@ -117,6 +120,7 @@ class DependencyResolver
      * Detect circular dependencies between tables.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<array<string>> Array of cycles, each cycle is an array of table names
      */
     public function detectCircularDependencies(array $tables): array
@@ -131,7 +135,7 @@ class DependencyResolver
         $recursionStack = [];
 
         foreach ($tables as $table) {
-            if (!isset($visited[$table->name])) {
+            if (! isset($visited[$table->name])) {
                 $path = [];
                 $this->detectCycles($table->name, $tableMap, $visited, $recursionStack, $path, $cycles);
             }
@@ -170,11 +174,11 @@ class DependencyResolver
                     continue;
                 }
 
-                if (!isset($tableMap[$referencedTable])) {
+                if (! isset($tableMap[$referencedTable])) {
                     continue;
                 }
 
-                if (!isset($visited[$referencedTable])) {
+                if (! isset($visited[$referencedTable])) {
                     $this->detectCycles($referencedTable, $tableMap, $visited, $recursionStack, $path, $cycles);
                 } elseif (isset($recursionStack[$referencedTable])) {
                     // Found a cycle
@@ -196,6 +200,7 @@ class DependencyResolver
      * Each batch contains tables that don't depend on tables in later batches.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<array<TableSchema>>
      */
     public function groupIntoBatches(array $tables): array
@@ -224,7 +229,7 @@ class DependencyResolver
                 }
             }
 
-            if (!$canAddToBatch && !empty($currentBatch)) {
+            if (! $canAddToBatch && ! empty($currentBatch)) {
                 $batches[] = $currentBatch;
                 $tablesInPreviousBatches = array_merge(
                     $tablesInPreviousBatches,
@@ -236,7 +241,7 @@ class DependencyResolver
             $currentBatch[] = $table;
         }
 
-        if (!empty($currentBatch)) {
+        if (! empty($currentBatch)) {
             $batches[] = $currentBatch;
         }
 
@@ -248,6 +253,7 @@ class DependencyResolver
      * Returns foreign keys in the order they should be added.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<array{table: string, foreign_key: \Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema}>
      */
     public function getForeignKeyOrder(array $tables): array
@@ -295,7 +301,7 @@ class DependencyResolver
             return true;
         }
 
-        if (isset($visited[$source]) || !isset($tableMap[$source])) {
+        if (isset($visited[$source]) || ! isset($tableMap[$source])) {
             return false;
         }
 
@@ -314,6 +320,7 @@ class DependencyResolver
      * Get the dependency graph showing which tables each table depends on.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string, array<string>>
      */
     public function getDependencyGraph(array $tables): array
@@ -339,6 +346,7 @@ class DependencyResolver
      * Get the reverse dependency graph showing which tables depend on each table.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string, array<string>>
      */
     public function getReverseDependencyGraph(array $tables): array
@@ -366,6 +374,7 @@ class DependencyResolver
      * Get tables that have no dependencies (root tables).
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string>
      */
     public function getRootTables(array $tables): array
@@ -389,7 +398,7 @@ class DependencyResolver
                 }
             }
 
-            if (!$hasDependency) {
+            if (! $hasDependency) {
                 $roots[] = $table->name;
             }
         }
@@ -401,6 +410,7 @@ class DependencyResolver
      * Get tables that no other tables depend on (leaf tables).
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string>
      */
     public function getLeafTables(array $tables): array
@@ -423,6 +433,7 @@ class DependencyResolver
      * and no non-FK columns except possibly timestamps.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string>
      */
     public function getPivotTables(array $tables): array
@@ -452,6 +463,7 @@ class DependencyResolver
      * Group tables by their dependency level.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<int, array<string>>
      */
     public function groupByLevel(array $tables): array
@@ -466,7 +478,7 @@ class DependencyResolver
 
         // Find root level (tables with no dependencies)
         $roots = $this->getRootTables($tables);
-        if (!empty($roots)) {
+        if (! empty($roots)) {
             $levels[0] = $roots;
             foreach ($roots as $root) {
                 $assigned[$root] = 0;
@@ -491,11 +503,11 @@ class DependencyResolver
                         continue; // Skip self-references
                     }
 
-                    if (!isset($tableMap[$fk->referencedTable])) {
+                    if (! isset($tableMap[$fk->referencedTable])) {
                         continue; // Skip external references
                     }
 
-                    if (!isset($assigned[$fk->referencedTable])) {
+                    if (! isset($assigned[$fk->referencedTable])) {
                         $canAssign = false;
                         break;
                     }
@@ -507,7 +519,7 @@ class DependencyResolver
                     $level = $maxLevel + 1;
                     $assigned[$table->name] = $level;
 
-                    if (!isset($levels[$level])) {
+                    if (! isset($levels[$level])) {
                         $levels[$level] = [];
                     }
                     $levels[$level][] = $table->name;

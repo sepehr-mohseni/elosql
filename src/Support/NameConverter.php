@@ -162,7 +162,7 @@ class NameConverter
     public function columnToPropertyName(string $columnName): string
     {
         // If already camelCase, return as-is
-        if (preg_match('/^[a-z]+[a-zA-Z]*$/', $columnName) && !str_contains($columnName, '_')) {
+        if (preg_match('/^[a-z]+[a-zA-Z]*$/', $columnName) && ! str_contains($columnName, '_')) {
             return $columnName;
         }
 
@@ -243,6 +243,7 @@ class NameConverter
      *
      * @param string $tableName
      * @param array<string> $allTables
+     *
      * @return bool
      */
     public function isPivotTable(string $tableName, array $allTables): bool
@@ -265,6 +266,7 @@ class NameConverter
      *
      * @param string $pivotTable
      * @param array<string> $allTables
+     *
      * @return array<string>
      */
     public function getPivotRelations(string $pivotTable, array $allTables): array

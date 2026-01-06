@@ -26,7 +26,8 @@ final class ColumnSchema implements JsonSerializable
         public readonly ?string $collation,
         public readonly ?string $comment,
         public readonly array $attributes = [],
-    ) {}
+    ) {
+    }
 
     public function hasDefault(): bool
     {

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Parsers;
 
-use Sepehr_Mohseni\Elosql\Exceptions\SchemaParserException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
+use Sepehr_Mohseni\Elosql\Exceptions\SchemaParserException;
 
 class SchemaParserFactory
 {
     public function __construct(
         protected Container $container,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a schema parser for the given connection.

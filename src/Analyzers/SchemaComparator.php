@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Analyzers;
 
+use RuntimeException;
 use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
-use Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema;
-use Sepehr_Mohseni\Elosql\ValueObjects\IndexSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
 
 class SchemaComparator
 {
     public function __construct(
         protected ?MigrationAnalyzer $migrationAnalyzer = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Compare two schema arrays directly.
      *
      * @param array<TableSchema> $current Current/source schema
      * @param array<TableSchema> $target Target schema
+     *
      * @return array{created: array<TableSchema>, dropped: array<TableSchema>, modified: array<array<string, mixed>>}
      */
     public function compare(array $current, array $target): array
@@ -50,10 +51,10 @@ class SchemaComparator
         $modified = [];
         foreach ($commonNames as $name) {
             $diff = $this->compareTable($currentByName[$name], $targetByName[$name]);
-            if (!empty($diff['columns']['added']) || !empty($diff['columns']['dropped']) ||
-                !empty($diff['columns']['modified']) || !empty($diff['indexes']['added']) ||
-                !empty($diff['indexes']['dropped']) || !empty($diff['foreign_keys']['added']) ||
-                !empty($diff['foreign_keys']['dropped'])) {
+            if (! empty($diff['columns']['added']) || ! empty($diff['columns']['dropped']) ||
+                ! empty($diff['columns']['modified']) || ! empty($diff['indexes']['added']) ||
+                ! empty($diff['indexes']['dropped']) || ! empty($diff['foreign_keys']['added']) ||
+                ! empty($diff['foreign_keys']['dropped'])) {
                 $modified[] = $diff;
             }
         }
@@ -97,7 +98,7 @@ class SchemaComparator
         $modifiedColumns = [];
         foreach ($commonColumnNames as $name) {
             $changes = $this->compareColumn($currentColumns[$name], $targetColumns[$name]);
-            if (!empty($changes)) {
+            if (! empty($changes)) {
                 $modifiedColumns[] = [
                     'column' => $targetColumns[$name],
                     'changes' => $changes,
@@ -189,7 +190,7 @@ class SchemaComparator
     {
         $diff = $this->compare($current, $target);
 
-        return !empty($diff['created']) || !empty($diff['dropped']) || !empty($diff['modified']);
+        return ! empty($diff['created']) || ! empty($diff['dropped']) || ! empty($diff['modified']);
     }
 
     /**
@@ -197,6 +198,7 @@ class SchemaComparator
      *
      * @param array<TableSchema> $current
      * @param array<TableSchema> $target
+     *
      * @return array<string, mixed>
      */
     public function getDiffSummary(array $current, array $target): array
@@ -229,15 +231,16 @@ class SchemaComparator
 
     /**
      * Compare database tables with existing migrations and return differences.
-     * (Used when MigrationAnalyzer is available)
+     * (Used when MigrationAnalyzer is available).
      *
      * @param array<TableSchema> $databaseTables
+     *
      * @return array{new: array<string>, modified: array<string>, removed: array<string>}
      */
     public function compareWithMigrations(array $databaseTables): array
     {
         if ($this->migrationAnalyzer === null) {
-            throw new \RuntimeException('MigrationAnalyzer not set. Use compare() for direct comparison.');
+            throw new RuntimeException('MigrationAnalyzer not set. Use compare() for direct comparison.');
         }
 
         $migrationTables = $this->migrationAnalyzer->getTablesInMigrations();
@@ -258,7 +261,7 @@ class SchemaComparator
     public function getTableDiff(TableSchema $table): array
     {
         if ($this->migrationAnalyzer === null) {
-            throw new \RuntimeException('MigrationAnalyzer not set.');
+            throw new RuntimeException('MigrationAnalyzer not set.');
         }
 
         $migrationColumns = $this->migrationAnalyzer->getColumnsInMigration($table->name);
@@ -281,6 +284,7 @@ class SchemaComparator
      *
      * @param array<TableSchema> $databaseTables
      * @param array<string> $migrationTables
+     *
      * @return array<string>
      */
     protected function findModifiedTables(array $databaseTables, array $migrationTables): array
@@ -292,13 +296,13 @@ class SchemaComparator
         $modified = [];
 
         foreach ($databaseTables as $table) {
-            if (!in_array($table->name, $migrationTables, true)) {
+            if (! in_array($table->name, $migrationTables, true)) {
                 continue; // New table, not modified
             }
 
             $diff = $this->getTableDiff($table);
 
-            if (!empty($diff['columns']['new']) || !empty($diff['columns']['removed'])) {
+            if (! empty($diff['columns']['new']) || ! empty($diff['columns']['removed'])) {
                 $modified[] = $table->name;
             }
         }
@@ -310,6 +314,7 @@ class SchemaComparator
      * Generate a human-readable diff report.
      *
      * @param array<TableSchema> $databaseTables
+     *
      * @return array<string, mixed>
      */
     public function generateReport(array $databaseTables): array
@@ -338,7 +343,7 @@ class SchemaComparator
         }
 
         // Generate recommended actions
-        if (!empty($comparison['new'])) {
+        if (! empty($comparison['new'])) {
             $report['actions'][] = [
                 'type' => 'create_migrations',
                 'description' => 'Create migrations for new tables',
@@ -346,7 +351,7 @@ class SchemaComparator
             ];
         }
 
-        if (!empty($comparison['modified'])) {
+        if (! empty($comparison['modified'])) {
             $report['actions'][] = [
                 'type' => 'review_modifications',
                 'description' => 'Review and potentially update migrations for modified tables',
@@ -375,6 +380,7 @@ class SchemaComparator
      * Get tables that need migrations.
      *
      * @param array<TableSchema> $databaseTables
+     *
      * @return array<TableSchema>
      */
     public function getTablesNeedingMigrations(array $databaseTables): array

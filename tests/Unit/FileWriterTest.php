@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests\Unit;
 
+use Illuminate\Filesystem\Filesystem;
 use Sepehr_Mohseni\Elosql\Support\FileWriter;
 use Sepehr_Mohseni\Elosql\Tests\TestCase;
-use Illuminate\Filesystem\Filesystem;
 
 class FileWriterTest extends TestCase
 {
     private FileWriter $writer;
+
     private Filesystem $filesystem;
+
     private string $tempDir;
 
     protected function setUp(): void
@@ -21,7 +23,7 @@ class FileWriterTest extends TestCase
         $this->filesystem = new Filesystem();
         $this->writer = new FileWriter($this->filesystem);
         $this->tempDir = sys_get_temp_dir() . '/elosql_test_' . uniqid();
-        $this->filesystem->makeDirectory($this->tempDir, 0755, true);
+        $this->filesystem->makeDirectory($this->tempDir, 0o755, true);
     }
 
     protected function tearDown(): void
@@ -147,8 +149,8 @@ class FileWriterTest extends TestCase
         file_put_contents($existingPath, '<?php // existing');
 
         $files = [
-            $this->tempDir . '/new.php' => "<?php // new",
-            $existingPath => "<?php // should be skipped",
+            $this->tempDir . '/new.php' => '<?php // new',
+            $existingPath => '<?php // should be skipped',
         ];
 
         $results = $this->writer->writeMultiple($files, overwrite: false);

@@ -39,7 +39,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
 
         $tableNames = array_map(fn ($row) => $row->TABLE_NAME, $tables);
 
-        if (!empty($excludeTables)) {
+        if (! empty($excludeTables)) {
             $tableNames = array_diff($tableNames, $excludeTables);
         }
 
@@ -48,7 +48,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
 
     public function parseTable(string $tableName): TableSchema
     {
-        if (!$this->tableExists($tableName)) {
+        if (! $this->tableExists($tableName)) {
             throw SchemaParserException::tableNotFound($tableName);
         }
 
@@ -136,7 +136,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
         $connection = $this->getConnection();
 
         $indexes = $connection->select(
-            "SELECT 
+            'SELECT 
                 i.name AS INDEX_NAME,
                 c.name AS COLUMN_NAME,
                 i.is_unique AS IS_UNIQUE,
@@ -151,7 +151,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
              WHERE t.name = ?
                 AND s.name = ?
                 AND i.name IS NOT NULL
-             ORDER BY i.name, ic.key_ordinal",
+             ORDER BY i.name, ic.key_ordinal',
             [$tableName, $this->schema]
         );
 
@@ -159,7 +159,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($indexes as $index) {
             $name = $index->INDEX_NAME;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],
@@ -185,7 +185,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
         $connection = $this->getConnection();
 
         $foreignKeys = $connection->select(
-            "SELECT 
+            'SELECT 
                 fk.name AS CONSTRAINT_NAME,
                 cp.name AS COLUMN_NAME,
                 rt.name AS REFERENCED_TABLE,
@@ -201,7 +201,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
              JOIN sys.columns cr ON fkc.referenced_object_id = cr.object_id AND fkc.referenced_column_id = cr.column_id
              WHERE t.name = ?
                 AND s.name = ?
-             ORDER BY fk.name, fkc.constraint_column_id",
+             ORDER BY fk.name, fkc.constraint_column_id',
             [$tableName, $this->schema]
         );
 
@@ -209,7 +209,7 @@ class SqlServerSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($foreignKeys as $fk) {
             $name = $fk->CONSTRAINT_NAME;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],

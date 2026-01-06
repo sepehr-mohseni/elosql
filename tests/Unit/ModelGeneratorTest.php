@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests\Unit;
 
+use Illuminate\Filesystem\Filesystem;
 use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Generators\RelationshipDetector;
 use Sepehr_Mohseni\Elosql\Support\FileWriter;
@@ -13,7 +14,6 @@ use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\IndexSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Filesystem\Filesystem;
 
 class ModelGeneratorTest extends TestCase
 {
@@ -38,6 +38,7 @@ class ModelGeneratorTest extends TestCase
     private function createGenerator(array $config): ModelGenerator
     {
         $nameConverter = new NameConverter();
+
         return new ModelGenerator(
             new RelationshipDetector($nameConverter),
             $nameConverter,

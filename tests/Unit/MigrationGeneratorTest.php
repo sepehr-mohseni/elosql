@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests\Unit;
 
+use Illuminate\Filesystem\Filesystem;
 use Sepehr_Mohseni\Elosql\Analyzers\DependencyResolver;
 use Sepehr_Mohseni\Elosql\Generators\MigrationGenerator;
 use Sepehr_Mohseni\Elosql\Support\FileWriter;
@@ -13,11 +14,11 @@ use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\IndexSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Filesystem\Filesystem;
 
 class MigrationGeneratorTest extends TestCase
 {
     private MigrationGenerator $generator;
+
     private string $tempDir;
 
     protected function setUp(): void
@@ -25,7 +26,7 @@ class MigrationGeneratorTest extends TestCase
         parent::setUp();
 
         $this->tempDir = sys_get_temp_dir() . '/elosql_migration_test_' . uniqid();
-        (new Filesystem())->makeDirectory($this->tempDir, 0755, true);
+        (new Filesystem())->makeDirectory($this->tempDir, 0o755, true);
 
         $this->generator = new MigrationGenerator(
             new TypeMapper(),
@@ -420,7 +421,7 @@ class MigrationGeneratorTest extends TestCase
     public function test_set_driver(): void
     {
         $this->generator->setDriver('pgsql');
-        
+
         // Create a simple table and verify it generates
         $table = new TableSchema(
             'test',
@@ -428,7 +429,7 @@ class MigrationGeneratorTest extends TestCase
             [],
             []
         );
-        
+
         $content = $this->generator->generateTableMigration($table);
         $this->assertStringContainsString('Migration', $content);
     }

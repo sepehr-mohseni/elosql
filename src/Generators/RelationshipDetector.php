@@ -12,13 +12,15 @@ class RelationshipDetector
 {
     public function __construct(
         protected NameConverter $nameConverter,
-    ) {}
+    ) {
+    }
 
     /**
      * Detect all relationships for a table (alias for detectRelationships).
      *
      * @param array<TableSchema> $allTables
      * @param array<string, mixed> $options
+     *
      * @return array<array<string, mixed>>
      */
     public function detect(TableSchema $table, array $allTables, array $options = []): array
@@ -31,6 +33,7 @@ class RelationshipDetector
      *
      * @param array<TableSchema> $allTables
      * @param array<string, mixed> $options
+     *
      * @return array<array<string, mixed>>
      */
     public function detectRelationships(TableSchema $table, array $allTables, array $options = []): array
@@ -126,6 +129,7 @@ class RelationshipDetector
      * Detect belongsToMany relationships through pivot tables.
      *
      * @param array<TableSchema> $allTables
+     *
      * @return array<array<string, mixed>>
      */
     protected function detectPivotRelationships(TableSchema $table, array $allTables): array
@@ -133,7 +137,7 @@ class RelationshipDetector
         $relationships = [];
 
         foreach ($allTables as $potentialPivot) {
-            if (!$this->isPivotTable($potentialPivot)) {
+            if (! $this->isPivotTable($potentialPivot)) {
                 continue;
             }
 
@@ -180,7 +184,7 @@ class RelationshipDetector
         }
 
         // Table name should follow convention (singular_singular)
-        if (!preg_match('/^[a-z0-9]+_[a-z0-9]+$/i', $table->name)) {
+        if (! preg_match('/^[a-z0-9]+_[a-z0-9]+$/i', $table->name)) {
             return false;
         }
 
@@ -208,7 +212,7 @@ class RelationshipDetector
 
         $extraColumns = [];
         foreach ($pivotTable->columns as $column) {
-            if (!in_array($column->name, $excludeColumns, true)) {
+            if (! in_array($column->name, $excludeColumns, true)) {
                 $extraColumns[] = $column->name;
             }
         }
@@ -234,6 +238,7 @@ class RelationshipDetector
      * Detect polymorphic relationships.
      *
      * @param array<TableSchema> $allTables
+     *
      * @return array<array<string, mixed>>
      */
     public function detectPolymorphicRelationships(TableSchema $table, array $allTables): array
@@ -242,14 +247,14 @@ class RelationshipDetector
 
         // Look for *_type and *_id column pairs
         foreach ($table->columns as $column) {
-            if (!str_ends_with($column->name, '_type')) {
+            if (! str_ends_with($column->name, '_type')) {
                 continue;
             }
 
             $baseName = substr($column->name, 0, -5);
             $idColumn = $baseName . '_id';
 
-            if (!$table->hasColumn($idColumn)) {
+            if (! $table->hasColumn($idColumn)) {
                 continue;
             }
 
@@ -327,7 +332,7 @@ class RelationshipDetector
                     $args[] = "'{$relatedPivotKey}'";
                 }
                 $methodCall = "{$indent}{$indent}return \$this->belongsToMany(" . implode(', ', $args) . ')';
-                if (!empty($pivotColumns)) {
+                if (! empty($pivotColumns)) {
                     $methodCall .= "\n{$indent}{$indent}{$indent}->withPivot('" . implode("', '", $pivotColumns) . "')";
                 }
                 $lines[] = $methodCall . ';';

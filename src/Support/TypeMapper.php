@@ -8,9 +8,7 @@ use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
 
 class TypeMapper
 {
-    /**
-     * @var array<string, array<string, mixed>>
-     */
+    /** @var array<string, array<string, mixed>> */
     protected array $customMappings;
 
     /**
@@ -302,6 +300,7 @@ class TypeMapper
      * Normalize a mapping to array format.
      *
      * @param string|array<string, mixed> $mapping
+     *
      * @return array<string, mixed>
      */
     protected function normalizeMapping(string|array $mapping): array

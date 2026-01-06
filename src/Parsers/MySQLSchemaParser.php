@@ -31,7 +31,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
 
         $tableNames = array_map(fn ($row) => $row->TABLE_NAME, $tables);
 
-        if (!empty($excludeTables)) {
+        if (! empty($excludeTables)) {
             $tableNames = array_diff($tableNames, $excludeTables);
         }
 
@@ -43,15 +43,15 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $connection = $this->getConnection();
         $database = $this->getDatabaseName();
 
-        if (!$this->tableExists($tableName)) {
+        if (! $this->tableExists($tableName)) {
             throw SchemaParserException::tableNotFound($tableName);
         }
 
         // Get table info
         $tableInfo = $connection->selectOne(
-            "SELECT ENGINE, TABLE_COLLATION, TABLE_COMMENT
+            'SELECT ENGINE, TABLE_COLLATION, TABLE_COMMENT
              FROM INFORMATION_SCHEMA.TABLES 
-             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?",
+             WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?',
             [$database, $tableName]
         );
 
@@ -87,7 +87,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $database = $this->getDatabaseName();
 
         $columns = $connection->select(
-            "SELECT 
+            'SELECT 
                 COLUMN_NAME,
                 COLUMN_TYPE,
                 DATA_TYPE,
@@ -103,7 +103,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
                 COLUMN_KEY
              FROM INFORMATION_SCHEMA.COLUMNS 
              WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-             ORDER BY ORDINAL_POSITION",
+             ORDER BY ORDINAL_POSITION',
             [$database, $tableName]
         );
 
@@ -122,7 +122,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $database = $this->getDatabaseName();
 
         $indexes = $connection->select(
-            "SELECT 
+            'SELECT 
                 INDEX_NAME,
                 COLUMN_NAME,
                 NON_UNIQUE,
@@ -130,7 +130,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
                 SEQ_IN_INDEX
              FROM INFORMATION_SCHEMA.STATISTICS 
              WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-             ORDER BY INDEX_NAME, SEQ_IN_INDEX",
+             ORDER BY INDEX_NAME, SEQ_IN_INDEX',
             [$database, $tableName]
         );
 
@@ -138,11 +138,11 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($indexes as $index) {
             $name = $index->INDEX_NAME;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],
-                    'unique' => !$index->NON_UNIQUE,
+                    'unique' => ! $index->NON_UNIQUE,
                     'type' => $index->INDEX_TYPE,
                 ];
             }
@@ -164,7 +164,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $database = $this->getDatabaseName();
 
         $foreignKeys = $connection->select(
-            "SELECT 
+            'SELECT 
                 kcu.CONSTRAINT_NAME,
                 kcu.COLUMN_NAME,
                 kcu.REFERENCED_TABLE_NAME,
@@ -178,7 +178,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
              WHERE kcu.TABLE_SCHEMA = ? 
                 AND kcu.TABLE_NAME = ?
                 AND kcu.REFERENCED_TABLE_NAME IS NOT NULL
-             ORDER BY kcu.CONSTRAINT_NAME, kcu.ORDINAL_POSITION",
+             ORDER BY kcu.CONSTRAINT_NAME, kcu.ORDINAL_POSITION',
             [$database, $tableName]
         );
 
@@ -186,7 +186,7 @@ class MySQLSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($foreignKeys as $fk) {
             $name = $fk->CONSTRAINT_NAME;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],

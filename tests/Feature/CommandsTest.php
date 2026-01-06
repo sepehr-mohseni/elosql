@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests\Feature;
 
-use Sepehr_Mohseni\Elosql\Tests\TestCase;
 use Illuminate\Support\Facades\Artisan;
+use Sepehr_Mohseni\Elosql\Tests\TestCase;
 
 class CommandsTest extends TestCase
 {

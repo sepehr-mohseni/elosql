@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Parsers;
 
+use Illuminate\Database\Connection;
+use RuntimeException;
 use Sepehr_Mohseni\Elosql\Support\TypeMapper;
 use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\IndexSchema;
-use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Database\Connection;
 
 abstract class AbstractSchemaParser implements SchemaParser
 {
@@ -17,7 +17,8 @@ abstract class AbstractSchemaParser implements SchemaParser
 
     public function __construct(
         protected TypeMapper $typeMapper,
-    ) {}
+    ) {
+    }
 
     public function setConnection(Connection $connection): self
     {
@@ -46,7 +47,7 @@ abstract class AbstractSchemaParser implements SchemaParser
     protected function getConnection(): Connection
     {
         if ($this->connection === null) {
-            throw new \RuntimeException('Database connection not set. Call setConnection() first.');
+            throw new RuntimeException('Database connection not set. Call setConnection() first.');
         }
 
         return $this->connection;
@@ -101,7 +102,7 @@ abstract class AbstractSchemaParser implements SchemaParser
         }
 
         // Check for numeric
-        if (is_numeric($default) && !str_starts_with($default, "'")) {
+        if (is_numeric($default) && ! str_starts_with($default, "'")) {
             if (str_contains($default, '.')) {
                 return (float) $default;
             }

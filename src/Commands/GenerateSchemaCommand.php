@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Commands;
 
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Sepehr_Mohseni\Elosql\Analyzers\SchemaComparator;
 use Sepehr_Mohseni\Elosql\Generators\MigrationGenerator;
 use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class GenerateSchemaCommand extends Command
 {
@@ -84,12 +85,12 @@ class GenerateSchemaCommand extends Command
             $tables = $this->parseTables($parser, $allTableNames);
 
             // Generate migrations
-            if (!$this->option('no-migrations')) {
+            if (! $this->option('no-migrations')) {
                 $this->generateMigrations($tables, $force, $separateFk);
             }
 
             // Generate models
-            if (!$this->option('no-models')) {
+            if (! $this->option('no-models')) {
                 $this->generateModels($tables, $force);
             }
 
@@ -97,7 +98,7 @@ class GenerateSchemaCommand extends Command
             $this->info('Schema generation completed successfully!');
 
             return self::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Error: ' . $e->getMessage());
 
             if ($this->output->isVerbose()) {
@@ -112,6 +113,7 @@ class GenerateSchemaCommand extends Command
      * Parse all tables.
      *
      * @param array<string> $tableNames
+     *
      * @return array<TableSchema>
      */
     protected function parseTables($parser, array $tableNames): array
@@ -146,7 +148,7 @@ class GenerateSchemaCommand extends Command
 
         $migrations = $this->migrationGenerator->generate($tables, $separateFk);
 
-        if (!$force) {
+        if (! $force) {
             $existingFiles = [];
             $migrationsPath = config('elosql.migrations_path', database_path('migrations'));
 
@@ -157,13 +159,13 @@ class GenerateSchemaCommand extends Command
                 }
             }
 
-            if (!empty($existingFiles)) {
+            if (! empty($existingFiles)) {
                 $this->warn('The following migration files already exist:');
                 foreach ($existingFiles as $file) {
                     $this->line("  - {$file}");
                 }
 
-                if (!$this->confirm('Do you want to overwrite them?')) {
+                if (! $this->confirm('Do you want to overwrite them?')) {
                     $this->info('Skipping migration generation.');
 
                     return;
@@ -191,7 +193,7 @@ class GenerateSchemaCommand extends Command
 
         $models = $this->modelGenerator->generateAll($tables);
 
-        if (!$force) {
+        if (! $force) {
             $existingFiles = [];
             $modelsPath = config('elosql.models.path', app_path('Models'));
 
@@ -202,13 +204,13 @@ class GenerateSchemaCommand extends Command
                 }
             }
 
-            if (!empty($existingFiles)) {
+            if (! empty($existingFiles)) {
                 $this->warn('The following model files already exist:');
                 foreach ($existingFiles as $file) {
                     $this->line("  - {$file}");
                 }
 
-                if (!$this->confirm('Do you want to overwrite them?')) {
+                if (! $this->confirm('Do you want to overwrite them?')) {
                     $this->info('Skipping model generation.');
 
                     return;

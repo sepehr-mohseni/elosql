@@ -9,12 +9,17 @@ use JsonSerializable;
 final class IndexSchema implements JsonSerializable
 {
     public const TYPE_PRIMARY = 'primary';
+
     public const TYPE_UNIQUE = 'unique';
+
     public const TYPE_INDEX = 'index';
+
     public const TYPE_FULLTEXT = 'fulltext';
+
     public const TYPE_SPATIAL = 'spatial';
 
     public const ALGORITHM_BTREE = 'btree';
+
     public const ALGORITHM_HASH = 'hash';
 
     /**
@@ -26,7 +31,8 @@ final class IndexSchema implements JsonSerializable
         public readonly array $columns,
         public readonly ?string $algorithm = null,
         public readonly bool $isComposite = false,
-    ) {}
+    ) {
+    }
 
     public function isPrimary(): bool
     {

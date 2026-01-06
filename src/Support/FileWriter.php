@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Support;
 
-use Sepehr_Mohseni\Elosql\Exceptions\GeneratorException;
 use Illuminate\Filesystem\Filesystem;
+use Sepehr_Mohseni\Elosql\Exceptions\GeneratorException;
 
 class FileWriter
 {
@@ -15,7 +15,8 @@ class FileWriter
     public function __construct(
         protected Filesystem $files,
         protected array $formatting = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Write content to a file.
@@ -26,14 +27,14 @@ class FileWriter
     {
         $directory = dirname($path);
 
-        if (!$this->files->isDirectory($directory)) {
-            if (!$this->files->makeDirectory($directory, 0755, true)) {
+        if (! $this->files->isDirectory($directory)) {
+            if (! $this->files->makeDirectory($directory, 0o755, true)) {
                 throw GeneratorException::directoryCreateFailed($directory);
             }
         }
 
         if ($this->files->exists($path)) {
-            if (!$overwrite) {
+            if (! $overwrite) {
                 return false;
             }
 
@@ -111,7 +112,7 @@ class FileWriter
     protected function sortImports(string $code): string
     {
         // Find the use statement block
-        if (!preg_match('/^(.*?)((?:use [^;]+;\n)+)(.*)/s', $code, $matches)) {
+        if (! preg_match('/^(.*?)((?:use [^;]+;\n)+)(.*)/s', $code, $matches)) {
             return $code;
         }
 
@@ -148,7 +149,7 @@ class FileWriter
      */
     public function generateMigrationFilename(string $name, ?int $timestamp = null): string
     {
-        $timestamp = $timestamp ?? time();
+        $timestamp ??= time();
         $date = date('Y_m_d_His', $timestamp);
         $snakeName = $this->toSnakeCase($name);
 
@@ -159,6 +160,7 @@ class FileWriter
      * Generate sequential migration filenames with incrementing timestamps.
      *
      * @param array<string> $names
+     *
      * @return array<string>
      */
     public function generateSequentialMigrationFilenames(array $names): array
@@ -179,6 +181,7 @@ class FileWriter
      *
      * @param array<string, string> $files Map of path => content
      * @param bool $overwrite
+     *
      * @return array{written: array<string>, skipped: array<string>}
      */
     public function writeMultiple(array $files, bool $overwrite = true): array
@@ -223,7 +226,7 @@ class FileWriter
      */
     public function delete(string $path): bool
     {
-        if (!$this->files->exists($path)) {
+        if (! $this->files->exists($path)) {
             return false;
         }
 

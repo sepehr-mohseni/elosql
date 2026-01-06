@@ -8,15 +8,14 @@ use Illuminate\Filesystem\Filesystem;
 
 class MigrationAnalyzer
 {
-    /**
-     * @var array<string, array<string, mixed>>|null
-     */
+    /** @var array<string, array<string, mixed>>|null */
     protected ?array $parsedMigrations = null;
 
     public function __construct(
         protected Filesystem $files,
         protected string $migrationsPath,
-    ) {}
+    ) {
+    }
 
     /**
      * Get all migration files.
@@ -25,7 +24,7 @@ class MigrationAnalyzer
      */
     public function getMigrationFiles(): array
     {
-        if (!$this->files->isDirectory($this->migrationsPath)) {
+        if (! $this->files->isDirectory($this->migrationsPath)) {
             return [];
         }
 
@@ -189,7 +188,7 @@ class MigrationAnalyzer
         // Find the Schema::create block for this table
         $pattern = '/Schema::create\s*\(\s*[\'"]' . preg_quote($tableName, '/') . '[\'"]\s*,\s*function[^{]*\{(.*?)\}\s*\)/s';
 
-        if (!preg_match($pattern, $content, $match)) {
+        if (! preg_match($pattern, $content, $match)) {
             return [];
         }
 

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Commands;
 
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Sepehr_Mohseni\Elosql\Generators\MigrationGenerator;
 use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class PreviewSchemaCommand extends Command
 {
@@ -51,7 +52,7 @@ class PreviewSchemaCommand extends Command
         $showModels = (bool) $this->option('models');
 
         // If neither specified, show both
-        if (!$showMigrations && !$showModels) {
+        if (! $showMigrations && ! $showModels) {
             $showMigrations = true;
             $showModels = true;
         }
@@ -97,7 +98,7 @@ class PreviewSchemaCommand extends Command
             }
 
             return self::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($asJson) {
                 $this->line(json_encode(['error' => $e->getMessage()], JSON_PRETTY_PRINT));
             } else {

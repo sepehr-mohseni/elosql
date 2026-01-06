@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Parsers;
 
-use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
 use Illuminate\Database\Connection;
+use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
 
 interface SchemaParser
 {
@@ -23,6 +23,7 @@ interface SchemaParser
      * Get all table names in the database.
      *
      * @param array<string> $excludeTables Tables to exclude
+     *
      * @return array<string>
      */
     public function getTables(array $excludeTables = []): array;
@@ -36,6 +37,7 @@ interface SchemaParser
      * Parse all tables and return their schemas.
      *
      * @param array<string> $excludeTables Tables to exclude
+     *
      * @return array<TableSchema>
      */
     public function parseAllTables(array $excludeTables = []): array;

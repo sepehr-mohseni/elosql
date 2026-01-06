@@ -24,7 +24,8 @@ final class TableSchema implements JsonSerializable
         public readonly ?string $collation = null,
         public readonly ?string $comment = null,
         public readonly array $attributes = [],
-    ) {}
+    ) {
+    }
 
     public function getColumn(string $name): ?ColumnSchema
     {
@@ -101,7 +102,7 @@ final class TableSchema implements JsonSerializable
      */
     public function getNonPrimaryIndexes(): array
     {
-        return array_filter($this->indexes, fn (IndexSchema $idx) => !$idx->isPrimary());
+        return array_filter($this->indexes, fn (IndexSchema $idx) => ! $idx->isPrimary());
     }
 
     /**
@@ -137,7 +138,7 @@ final class TableSchema implements JsonSerializable
         }
 
         // Name should follow convention: table1_table2
-        if (!preg_match('/^[a-z0-9]+_[a-z0-9]+$/i', $this->name)) {
+        if (! preg_match('/^[a-z0-9]+_[a-z0-9]+$/i', $this->name)) {
             return false;
         }
 

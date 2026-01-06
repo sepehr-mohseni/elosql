@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Commands;
 
+use Exception;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class GenerateModelsCommand extends Command
 {
@@ -61,7 +62,7 @@ class GenerateModelsCommand extends Command
 
             $allTableNames = $parser->getTables($excludeTables);
 
-            if (!empty($specificTables)) {
+            if (! empty($specificTables)) {
                 $allTableNames = array_intersect($allTableNames, $specificTables);
             }
 
@@ -93,7 +94,7 @@ class GenerateModelsCommand extends Command
             $this->displayGeneratedFiles($writtenFiles);
 
             return self::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Error: ' . $e->getMessage());
 
             if ($this->output->isVerbose()) {
@@ -108,6 +109,7 @@ class GenerateModelsCommand extends Command
      * Parse all tables.
      *
      * @param array<string> $tableNames
+     *
      * @return array<TableSchema>
      */
     protected function parseTables($parser, array $tableNames): array
@@ -158,7 +160,7 @@ class GenerateModelsCommand extends Command
         }
 
         $this->newLine();
-        $this->info("Preview complete. {" . count($models) . "} models would be generated.");
+        $this->info('Preview complete. {' . count($models) . '} models would be generated.');
         $this->info('Run without --preview to write files.');
     }
 
@@ -166,13 +168,14 @@ class GenerateModelsCommand extends Command
      * Write models to disk.
      *
      * @param array<string, string> $models
+     *
      * @return array<string>
      */
     protected function writeModels(array $models, bool $overwrite): array
     {
         $modelsPath = config('elosql.models.path', app_path('Models'));
 
-        if (!$overwrite) {
+        if (! $overwrite) {
             $existingFiles = [];
 
             foreach (array_keys($models) as $filename) {
@@ -182,13 +185,13 @@ class GenerateModelsCommand extends Command
                 }
             }
 
-            if (!empty($existingFiles)) {
+            if (! empty($existingFiles)) {
                 $this->warn('The following model files already exist:');
                 foreach ($existingFiles as $file) {
                     $this->line("  - {$file}");
                 }
 
-                if (!$this->confirm('Overwrite existing files?', false)) {
+                if (! $this->confirm('Overwrite existing files?', false)) {
                     // Remove existing files from models
                     foreach ($existingFiles as $file) {
                         unset($models[$file]);

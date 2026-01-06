@@ -9,9 +9,13 @@ use JsonSerializable;
 final class ForeignKeySchema implements JsonSerializable
 {
     public const ACTION_CASCADE = 'CASCADE';
+
     public const ACTION_SET_NULL = 'SET NULL';
+
     public const ACTION_SET_DEFAULT = 'SET DEFAULT';
+
     public const ACTION_RESTRICT = 'RESTRICT';
+
     public const ACTION_NO_ACTION = 'NO ACTION';
 
     /**
@@ -25,7 +29,8 @@ final class ForeignKeySchema implements JsonSerializable
         public readonly array $referencedColumns,
         public readonly string $onDelete = self::ACTION_RESTRICT,
         public readonly string $onUpdate = self::ACTION_RESTRICT,
-    ) {}
+    ) {
+    }
 
     public function isComposite(): bool
     {

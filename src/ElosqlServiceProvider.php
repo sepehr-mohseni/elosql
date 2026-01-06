@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql;
 
+use Illuminate\Support\ServiceProvider;
 use Sepehr_Mohseni\Elosql\Analyzers\DependencyResolver;
 use Sepehr_Mohseni\Elosql\Analyzers\MigrationAnalyzer;
 use Sepehr_Mohseni\Elosql\Analyzers\SchemaComparator;
@@ -17,14 +18,12 @@ use Sepehr_Mohseni\Elosql\Generators\ModelGenerator;
 use Sepehr_Mohseni\Elosql\Generators\RelationshipDetector;
 use Sepehr_Mohseni\Elosql\Parsers\MySQLSchemaParser;
 use Sepehr_Mohseni\Elosql\Parsers\PostgreSQLSchemaParser;
-use Sepehr_Mohseni\Elosql\Parsers\SchemaParser;
 use Sepehr_Mohseni\Elosql\Parsers\SchemaParserFactory;
 use Sepehr_Mohseni\Elosql\Parsers\SQLiteSchemaParser;
 use Sepehr_Mohseni\Elosql\Parsers\SqlServerSchemaParser;
 use Sepehr_Mohseni\Elosql\Support\FileWriter;
 use Sepehr_Mohseni\Elosql\Support\NameConverter;
 use Sepehr_Mohseni\Elosql\Support\TypeMapper;
-use Illuminate\Support\ServiceProvider;
 
 class ElosqlServiceProvider extends ServiceProvider
 {

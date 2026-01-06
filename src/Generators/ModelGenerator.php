@@ -73,6 +73,7 @@ class ModelGenerator
      * Generate models for multiple tables.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string, string> Map of filename to content
      */
     public function generateAll(array $tables): array
@@ -166,7 +167,7 @@ class ModelGenerator
 
             // Check if primary key is not auto-incrementing
             $pkColumn = $table->getColumn($pkColumns[0] ?? 'id');
-            if ($pkColumn !== null && !$pkColumn->autoIncrement) {
+            if ($pkColumn !== null && ! $pkColumn->autoIncrement) {
                 $properties[] = 'public $incrementing = false;';
             }
 
@@ -177,7 +178,7 @@ class ModelGenerator
         }
 
         // Timestamps
-        if (!$table->hasTimestamps()) {
+        if (! $table->hasTimestamps()) {
             $properties[] = 'public $timestamps = false;';
         }
 
@@ -192,7 +193,7 @@ class ModelGenerator
 
         // Casts
         $casts = $this->getCasts($table);
-        if (!empty($casts)) {
+        if (! empty($casts)) {
             $properties[] = $this->formatCastsProperty($casts);
         }
 
@@ -206,7 +207,7 @@ class ModelGenerator
      */
     protected function buildRelationships(TableSchema $table, array $allTables): string
     {
-        if (!($this->config['generate_relationships'] ?? true)) {
+        if (! ($this->config['generate_relationships'] ?? true)) {
             return '';
         }
 
@@ -262,11 +263,11 @@ class ModelGenerator
             : '';
 
         return <<<PHP
-{$docblock}    public function {$method}(): {$returnType}
-    {
-        {$body}
-    }
-PHP;
+            {$docblock}    public function {$method}(): {$returnType}
+                {
+                    {$body}
+                }
+            PHP;
     }
 
     /**
@@ -328,7 +329,7 @@ PHP;
 
         $body = "return \$this->belongsToMany({$relatedModel}::class, '{$pivotTable}', '{$foreignPivotKey}', '{$relatedPivotKey}')";
 
-        if (!empty($pivotColumns)) {
+        if (! empty($pivotColumns)) {
             $columns = "['" . implode("', '", $pivotColumns) . "']";
             $body .= "\n            ->withPivot({$columns})";
         }
@@ -350,14 +351,14 @@ PHP;
         $morphName = $relationship['morph_name'];
 
         return <<<PHP
-    /**
-     * Get the {$method} polymorphic relationship.
-     */
-    public function {$method}(): \Illuminate\Database\Eloquent\Relations\MorphTo
-    {
-        return \$this->morphTo('{$morphName}');
-    }
-PHP;
+                /**
+                 * Get the {$method} polymorphic relationship.
+                 */
+                public function {$method}(): \Illuminate\Database\Eloquent\Relations\MorphTo
+                {
+                    return \$this->morphTo('{$morphName}');
+                }
+            PHP;
     }
 
     /**
@@ -365,7 +366,7 @@ PHP;
      */
     protected function buildScopes(TableSchema $table): string
     {
-        if (!($this->config['generate_scopes'] ?? true)) {
+        if (! ($this->config['generate_scopes'] ?? true)) {
             return '';
         }
 
@@ -389,28 +390,29 @@ PHP;
         // Active/Status scope for boolean columns
         if ($column->isBoolean() && in_array($column->name, ['active', 'is_active', 'enabled', 'status'], true)) {
             return <<<PHP
-    /**
-     * Scope a query to only include active records.
-     */
-    public function scopeActive(Builder \$query): Builder
-    {
-        return \$query->where('{$column->name}', true);
-    }
-PHP;
+                    /**
+                     * Scope a query to only include active records.
+                     */
+                    public function scopeActive(Builder \$query): Builder
+                    {
+                        return \$query->where('{$column->name}', true);
+                    }
+                PHP;
         }
 
         // Status scope for enum columns
         if ($column->isEnum() && in_array($column->name, ['status', 'state', 'type'], true)) {
             $scopeName = 'scopeBy' . $this->nameConverter->studly($column->name);
+
             return <<<PHP
-    /**
-     * Scope a query to filter by {$column->name}.
-     */
-    public function {$scopeName}(Builder \$query, string \$value): Builder
-    {
-        return \$query->where('{$column->name}', \$value);
-    }
-PHP;
+                    /**
+                     * Scope a query to filter by {$column->name}.
+                     */
+                    public function {$scopeName}(Builder \$query, string \$value): Builder
+                    {
+                        return \$query->where('{$column->name}', \$value);
+                    }
+                PHP;
         }
 
         return null;
@@ -427,7 +429,7 @@ PHP;
 
         $fillable = [];
         foreach ($table->columns as $column) {
-            if (!in_array($column->name, $guarded, true) && !$column->autoIncrement) {
+            if (! in_array($column->name, $guarded, true) && ! $column->autoIncrement) {
                 $fillable[] = $column->name;
             }
         }
@@ -546,7 +548,7 @@ PHP;
         TableSchema $table
     ): string {
         $useStatements = implode("\n", array_map(fn ($i) => "use {$i};", $imports));
-        $traitUse = !empty($traits) ? "\n    use " . implode(', ', $traits) . ";\n" : '';
+        $traitUse = ! empty($traits) ? "\n    use " . implode(', ', $traits) . ";\n" : '';
 
         $baseClassName = class_basename($baseClass);
 
@@ -561,19 +563,19 @@ PHP;
         $body = implode("\n\n", $bodyParts);
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-namespace {$namespace};
+            namespace {$namespace};
 
-{$useStatements}
+            {$useStatements}
 
-{$docblock}class {$modelName} extends {$baseClassName}
-{{$traitUse}
-    {$body}
-}
-PHP;
+            {$docblock}class {$modelName} extends {$baseClassName}
+            {{$traitUse}
+                {$body}
+            }
+            PHP;
     }
 
     /**
@@ -581,7 +583,7 @@ PHP;
      */
     protected function buildClassDocblock(TableSchema $table): string
     {
-        $lines = ["/**"];
+        $lines = ['/**'];
 
         // Add property annotations for columns
         foreach ($table->columns as $column) {
@@ -628,6 +630,7 @@ PHP;
      * Write models to disk.
      *
      * @param array<string, string> $models
+     *
      * @return array<string> List of written files
      */
     public function writeModels(array $models, bool $force = false): array

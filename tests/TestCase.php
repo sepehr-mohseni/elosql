@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Tests;
 
-use Sepehr_Mohseni\Elosql\ElosqlServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Sepehr_Mohseni\Elosql\ElosqlServiceProvider;
 
 abstract class TestCase extends Orchestra
 {

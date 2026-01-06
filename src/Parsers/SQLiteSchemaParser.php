@@ -29,7 +29,7 @@ class SQLiteSchemaParser extends AbstractSchemaParser
 
         $tableNames = array_map(fn ($row) => $row->name, $tables);
 
-        if (!empty($excludeTables)) {
+        if (! empty($excludeTables)) {
             $tableNames = array_diff($tableNames, $excludeTables);
         }
 
@@ -38,7 +38,7 @@ class SQLiteSchemaParser extends AbstractSchemaParser
 
     public function parseTable(string $tableName): TableSchema
     {
-        if (!$this->tableExists($tableName)) {
+        if (! $this->tableExists($tableName)) {
             throw SchemaParserException::tableNotFound($tableName);
         }
 
@@ -90,7 +90,7 @@ class SQLiteSchemaParser extends AbstractSchemaParser
 
         // Add primary key as index if it exists
         $pkColumns = $this->getPrimaryKeyColumns($tableName);
-        if (!empty($pkColumns)) {
+        if (! empty($pkColumns)) {
             $result[] = new IndexSchema(
                 name: 'PRIMARY',
                 type: IndexSchema::TYPE_PRIMARY,
@@ -138,7 +138,7 @@ class SQLiteSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($foreignKeys as $fk) {
             $id = $fk->id;
-            if (!isset($grouped[$id])) {
+            if (! isset($grouped[$id])) {
                 $grouped[$id] = [
                     'name' => "fk_{$tableName}_{$fk->table}_{$id}",
                     'columns' => [],

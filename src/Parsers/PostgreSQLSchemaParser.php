@@ -31,15 +31,15 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
         $connection = $this->getConnection();
 
         $tables = $connection->select(
-            "SELECT tablename FROM pg_tables 
+            'SELECT tablename FROM pg_tables 
              WHERE schemaname = ?
-             ORDER BY tablename",
+             ORDER BY tablename',
             [$this->schema]
         );
 
         $tableNames = array_map(fn ($row) => $row->tablename, $tables);
 
-        if (!empty($excludeTables)) {
+        if (! empty($excludeTables)) {
             $tableNames = array_diff($tableNames, $excludeTables);
         }
 
@@ -48,7 +48,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
 
     public function parseTable(string $tableName): TableSchema
     {
-        if (!$this->tableExists($tableName)) {
+        if (! $this->tableExists($tableName)) {
             throw SchemaParserException::tableNotFound($tableName);
         }
 
@@ -56,10 +56,10 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
 
         // Get table comment
         $tableComment = $connection->selectOne(
-            "SELECT obj_description(c.oid) as comment
+            'SELECT obj_description(c.oid) as comment
              FROM pg_class c
              JOIN pg_namespace n ON n.oid = c.relnamespace
-             WHERE c.relname = ? AND n.nspname = ?",
+             WHERE c.relname = ? AND n.nspname = ?',
             [$tableName, $this->schema]
         );
 
@@ -128,7 +128,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
         $connection = $this->getConnection();
 
         $indexes = $connection->select(
-            "SELECT 
+            'SELECT 
                 i.relname AS index_name,
                 a.attname AS column_name,
                 ix.indisunique AS is_unique,
@@ -143,7 +143,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
              JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
              WHERE t.relname = ?
                 AND n.nspname = ?
-             ORDER BY i.relname, array_position(ix.indkey, a.attnum)",
+             ORDER BY i.relname, array_position(ix.indkey, a.attnum)',
             [$tableName, $this->schema]
         );
 
@@ -151,7 +151,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($indexes as $index) {
             $name = $index->index_name;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],
@@ -201,7 +201,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
         $grouped = [];
         foreach ($foreignKeys as $fk) {
             $name = $fk->constraint_name;
-            if (!isset($grouped[$name])) {
+            if (! isset($grouped[$name])) {
                 $grouped[$name] = [
                     'name' => $name,
                     'columns' => [],
@@ -226,7 +226,7 @@ class PostgreSQLSchemaParser extends AbstractSchemaParser
         $dataType = $columnInfo['data_type'];
         $udtName = $columnInfo['udt_name'];
         $type = $this->normalizePostgresType($udtName, $dataType);
-        $nullable = !$columnInfo['not_null'];
+        $nullable = ! $columnInfo['not_null'];
 
         $default = $this->parsePostgresDefault(
             $columnInfo['column_default'],

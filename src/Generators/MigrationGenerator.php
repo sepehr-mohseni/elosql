@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sepehr_Mohseni\Elosql\Generators;
 
+use Illuminate\Support\Str;
 use Sepehr_Mohseni\Elosql\Analyzers\DependencyResolver;
 use Sepehr_Mohseni\Elosql\Support\FileWriter;
 use Sepehr_Mohseni\Elosql\Support\TypeMapper;
@@ -11,7 +12,6 @@ use Sepehr_Mohseni\Elosql\ValueObjects\ColumnSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\ForeignKeySchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\IndexSchema;
 use Sepehr_Mohseni\Elosql\ValueObjects\TableSchema;
-use Illuminate\Support\Str;
 
 class MigrationGenerator
 {
@@ -22,7 +22,8 @@ class MigrationGenerator
         protected DependencyResolver $dependencyResolver,
         protected FileWriter $fileWriter,
         protected string $migrationsPath,
-    ) {}
+    ) {
+    }
 
     /**
      * Set the database driver for type mapping.
@@ -39,6 +40,7 @@ class MigrationGenerator
      *
      * @param array<TableSchema> $tables
      * @param bool $separateForeignKeys Generate foreign keys in separate migrations
+     *
      * @return array<string, string> Map of filename to content
      */
     public function generate(array $tables, bool $separateForeignKeys = true): array
@@ -90,6 +92,7 @@ class MigrationGenerator
      * Generate foreign key migrations for all tables.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string, string>
      */
     protected function generateForeignKeyMigrations(array $tables, int $startTimestamp): array
@@ -168,11 +171,11 @@ class MigrationGenerator
         $line = $this->typeMapper->buildMethodCall($column, $this->driver);
 
         // Add modifiers
-        if ($column->nullable && !$column->autoIncrement) {
+        if ($column->nullable && ! $column->autoIncrement) {
             $line .= '->nullable()';
         }
 
-        if ($column->hasDefault() && !$column->autoIncrement) {
+        if ($column->hasDefault() && ! $column->autoIncrement) {
             $default = $this->formatDefaultValue($column->default, $column->type);
             if ($default !== null) {
                 $line .= "->default({$default})";
@@ -352,33 +355,33 @@ class MigrationGenerator
     protected function buildMigrationClass(string $className, string $upContent, string $downContent): string
     {
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+            use Illuminate\Database\Migrations\Migration;
+            use Illuminate\Database\Schema\Blueprint;
+            use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        {$upContent}
-    }
+            return new class extends Migration
+            {
+                /**
+                 * Run the migrations.
+                 */
+                public function up(): void
+                {
+                    {$upContent}
+                }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        {$downContent}
-    }
-};
-PHP;
+                /**
+                 * Reverse the migrations.
+                 */
+                public function down(): void
+                {
+                    {$downContent}
+                }
+            };
+            PHP;
     }
 
     /**
@@ -434,6 +437,7 @@ PHP;
      * Write migrations to disk.
      *
      * @param array<string, string> $migrations
+     *
      * @return array<string> List of written files
      */
     public function writeMigrations(array $migrations, bool $force = false): array
@@ -453,6 +457,7 @@ PHP;
      * Preview migrations without writing.
      *
      * @param array<TableSchema> $tables
+     *
      * @return array<string, string>
      */
     public function preview(array $tables, bool $separateForeignKeys = true): array
