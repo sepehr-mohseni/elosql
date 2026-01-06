@@ -321,22 +321,7 @@ class MigrationGenerator
             $content .= "\n" . $this->indent($foreignKeys, 3);
         }
 
-        $content .= "\n        })";
-
-        // Add table options
-        if ($table->engine !== null && $table->engine !== 'InnoDB') {
-            $content .= "->engine('{$table->engine}')";
-        }
-
-        if ($table->charset !== null) {
-            $content .= "->charset('{$table->charset}')";
-        }
-
-        if ($table->collation !== null) {
-            $content .= "->collation('{$table->collation}')";
-        }
-
-        $content .= ';';
+        $content .= "\n        });";
 
         return $content;
     }
